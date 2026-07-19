@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Happy Birthday 🎂</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html,body { height:100%; overflow:hidden; background:#0a0a0d; }
+  #aurora {
+    position:fixed; inset:-20%; z-index:0; pointer-events:none;
+    background:
+      radial-gradient(circle at 20% 25%, rgba(255,46,99,.25), transparent 40%),
+      radial-gradient(circle at 80% 20%, rgba(8,247,254,.18), transparent 40%),
+      radial-gradient(circle at 50% 85%, rgba(255,107,53,.22), transparent 45%);
+    filter:blur(60px); animation:auroraShift 14s ease-in-out infinite alternate;
+  }
+  @keyframes auroraShift {
+    0% { transform:translate(0,0) scale(1) rotate(0deg); }
+    100% { transform:translate(-3%,3%) scale(1.15) rotate(6deg); }
+  }
+  .screen { transition:opacity .45s ease; opacity:0; }
+  .screen.active { opacity:1; }
+  body {
+    font-family:'Poppins',sans-serif; color:#f5f0eb;
+    position:relative; width:100%; height:100%;
+  }
+  h1,h2,.display { font-family:'Space Grotesk',sans-serif; }
+
+  canvas#bgCanvas { position:fixed; inset:0; width:100%; height:100%; z-index:0; }
+
+  .screen {
+    position:fixed; inset:0; z-index:2; display:none;
+    flex-direction:column; align-items:center; justify-content:center;
+    text-align:center; padding:24px;
+  }
+  .screen.active { display:flex; }
+
+  /* ===== SCREEN 1: CAKE ===== */
+  #glowVignette {
+    position:fixed; inset:0; z-index:1; pointer-events:none;
+    background:radial-gradient(circle at 50% 65%, rgba(255,107,53,0.35), rgba(0,0,0,0) 55%);
+    animation:flicker 0.4s infinite alternate; transition:opacity .3s;
+  }
+  @keyframes flicker {
+    0% { opacity:.55; }
+    100% { opacity:.85; }
+  }
+  #cakeScreen .cakeCard {
+    background:rgba(20,20,26,.5); backdrop-filter:blur(12px);
+    border:1px solid rgba(255,107,53,.3); border-radius:26px;
+    padding:36px 28px 30px; box-shadow:0 0 50px rgba(255,107,53,.15);
+  }
+  #cakeScreen h1 {
+    font-size:1.6rem; margin-bottom:8px;
+    background:linear-gradient(90deg,#ff6b35,#ffb347,#ff2e63);
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+    background-size:200% auto; animation:shine 4s linear infinite;
+  }
+  #cakeScreen p.sub { color:#c9a9d9; font-size:.85rem; margin-bottom:30px; }
+  .cakeWrap { position:relative; width:200px; }
+  .glowRing {
+    position:absolute; top:-90px; left:50%; width:60px; height:60px;
+    border-radius:50%; transform:translate(-50%,0) scale(1);
+    background:radial-gradient(circle, rgba(255,183,71,.55), rgba(255,107,53,0) 70%);
+    transition:transform .08s linear; pointer-events:none;
+  }
+  .candle { width:14px; height:60px; background:#f5e9dc; margin:0 auto; position:relative; border-radius:3px; }
+  .flame {
+    width:20px; height:30px; background:radial-gradient(circle,#fff59d,#ff6b35);
+    border-radius:50% 50% 50% 50% / 60% 60% 40% 40%;
+    position:absolute; top:-28px; left:50%; transform:translateX(-50%);
+    animation:flick 0.25s infinite alternate;
+    box-shadow:0 0 25px #ff9d3d, 0 0 50px #ff6b35;
+    transition:opacity .4s, transform .4s;
+  }
+  .flame.out { opacity:0; transform:translateX(-50%) scale(0); }
+  @keyframes flick {
+    0% { transform:translateX(-50%) rotate(-4deg) scale(1); }
+    100% { transform:translateX(-50%) rotate(4deg) scale(1.08); }
+  }
+  .cakeBody { width:200px; height:110px; background:#e07a5f; border-radius:12px 12px 24px 24px; position:relative; box-shadow:0 0 40px rgba(255,107,53,.25); }
+  .cakeBody::before { content:''; position:absolute; top:-16px; left:0; width:100%; height:26px; background:#f2cc8f; border-radius:12px; }
+  #micStatus { margin-top:22px; font-size:.85rem; color:#c9a9d9; min-height:20px; }
+  #tapFallback {
+    margin-top:14px; padding:10px 22px; border:none; border-radius:30px;
+    background:linear-gradient(135deg,#ff2e63,#ff6b35); color:#fff; font-weight:600;
+    font-size:.85rem; cursor:pointer; display:none; box-shadow:0 0 20px rgba(255,46,99,.4);
+    transition:transform .12s;
+  }
+  #tapFallback:active { transform:scale(.92); }
+  .shockwave {
+    position:fixed; top:50%; left:50%; width:10px; height:10px; border-radius:50%;
+    background:radial-gradient(circle, #fff, #ff6b35 40%, transparent 70%);
+    transform:translate(-50%,-50%) scale(0); opacity:0; z-index:5; pointer-events:none;
+  }
+  .shockwave.go { animation:shockwaveGo .8s ease-out forwards; }
+  @keyframes shockwaveGo {
+    0% { transform:translate(-50%,-50%) scale(0); opacity:1; }
+    100% { transform:translate(-50%,-50%) scale(60); opacity:0; }
+  }
+
+  /* ===== SCREEN 2: PASSCODE ===== */
+  .blob { position:fixed; border-radius:50%; filter:blur(40px); opacity:.18; z-index:1; pointer-events:none; }
+  #passScreen { position:relative; }
+  #passScreen .giftCard {
+    background:rgba(20,20,26,.55); backdrop-filter:blur(12px);
+    border:1px solid rgba(255,107,53,.35); border-radius:24px;
+    padding:38px 30px 34px; width:300px; max-width:85vw;
+    box-shadow:0 0 50px rgba(255,46,99,.18), inset 0 0 30px rgba(255,107,53,.06);
+  }
+  #passScreen h2 {
+    font-size:1.5rem; margin-bottom:8px;
+    background:linear-gradient(90deg,#ff2e63,#ffb347,#08f7fe);
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+    background-size:200% auto; animation:shine 4s linear infinite;
+  }
+  @keyframes shine { to { background-position:200% center; } }
+  #passScreen .sub { color:#c9a9d9; font-size:.85rem; margin-bottom:26px; }
+  .lockIcon { font-size:2.6rem; margin-bottom:14px; display:inline-block; transition:transform .2s; filter:drop-shadow(0 0 12px rgba(255,107,53,.5)); }
+  .lockIcon.rattle { animation:rattle .35s; }
+  .lockIcon.open { animation:popOpen .5s ease forwards; }
+  @keyframes rattle {
+    0%,100% { transform:rotate(0); }
+    25% { transform:rotate(-12deg); }
+    75% { transform:rotate(12deg); }
+  }
+  @keyframes popOpen { 0% { transform:scale(1);} 60% { transform:scale(1.4);} 100% { transform:scale(1.1);} }
+
+  .inputWrap { position:relative; }
+  #passInput {
+    padding:14px 22px; font-size:1.05rem; border-radius:14px; width:270px; max-width:78vw;
+    background:rgba(20,20,26,.75); backdrop-filter:blur(6px);
+    border:2px solid #ff2e63; outline:none; color:#08f7fe; text-align:center;
+    font-family:'Space Grotesk',monospace; letter-spacing:2px;
+    box-shadow:0 0 18px rgba(255,46,99,.35); transition:box-shadow .2s, border-color .2s;
+  }
+  #passInput:focus { box-shadow:0 0 30px rgba(8,247,254,.5); border-color:#08f7fe; }
+  #passInput.glitch1 { animation:shakeSm .3s; }
+  #passInput.glitch2 { animation:shakeMd .4s; }
+  #passInput.glitch3 { animation:shakeBig .5s; filter:hue-rotate(90deg); }
+  @keyframes shakeSm { 20%,60%{transform:translateX(-6px);} 40%,80%{transform:translateX(6px);} }
+  @keyframes shakeMd {
+    10%,90%{transform:translate(-2px,0);} 20%,80%{transform:translate(4px,-2px);}
+    30%,50%,70%{transform:translate(-8px,2px) skewX(-2deg);} 40%,60%{transform:translate(8px,-2px) skewX(2deg);}
+  }
+  @keyframes shakeBig {
+    0%{transform:translate(0,0);} 15%{transform:translate(-12px,3px) skewX(-4deg);}
+    30%{transform:translate(10px,-3px) skewX(3deg);} 45%{transform:translate(-14px,2px);}
+    60%{transform:translate(12px,-2px);} 75%{transform:translate(-6px,3px);} 100%{transform:translate(0,0);}
+  }
+  #submitBtn {
+    margin-top:16px; padding:11px 30px; border:none; border-radius:30px;
+    background:linear-gradient(135deg,#ff2e63,#ff6b35); color:#fff; font-weight:600;
+    font-family:'Space Grotesk',sans-serif; cursor:pointer; font-size:.9rem;
+    box-shadow:0 0 20px rgba(255,46,99,.45); transition:transform .12s;
+  }
+  #submitBtn:active { transform:scale(.92); }
+  #hintText { margin-top:20px; color:#c9a9d9; font-size:.85rem; max-width:300px; min-height:40px; }
+
+  /* ===== SCREEN 3: YES/NO ===== */
+  #confirmScreen .card {
+    background:rgba(20,20,26,.6); backdrop-filter:blur(10px);
+    border:1px solid rgba(255,46,99,.4); border-radius:20px; padding:34px 26px;
+    box-shadow:0 0 40px rgba(255,46,99,.2); position:relative; width:280px; max-width:82vw; min-height:220px;
+  }
+  #confirmScreen h2 { font-size:1.2rem; margin-bottom:26px; color:#f5f0eb; }
+  .btnRow { position:relative; height:60px; }
+  #yesBtn, #noBtn {
+    border:none; border-radius:30px; font-weight:600; cursor:pointer;
+    font-family:'Space Grotesk',sans-serif; transition:transform .15s, opacity .3s, font-size .3s;
+  }
+  #yesBtn:active { transform:scale(.92); }
+  #yesBtn {
+    padding:12px 30px; background:linear-gradient(135deg,#08f7fe,#ff2e63); color:#0a0a0d;
+    box-shadow:0 0 22px rgba(8,247,254,.5); margin-right:14px;
+  }
+  #noBtn {
+    padding:12px 26px; background:rgba(255,255,255,.08); color:#f5f0eb; border:1px solid rgba(255,255,255,.25);
+    position:relative;
+  }
+  #noBtn.dodging { position:fixed !important; z-index:20; }
+  #noBtn.tiny { font-size:.6rem; padding:6px 12px; opacity:.7; }
+
+  /* ===== SCREEN 4: SURPRISE ===== */
+  canvas#particleCanvas { position:fixed; inset:0; z-index:6; pointer-events:none; }
+  #surpriseScreen .photoFrame {
+    position:relative; width:220px; margin:0 auto 18px; border-radius:20px; padding:5px;
+    background:linear-gradient(120deg,#ff2e63,#ffb347,#08f7fe,#ff2e63);
+    background-size:300% 300%; animation:borderSpin 5s linear infinite;
+    opacity:0; transform:scale(.7); transition:opacity .6s ease, transform .6s ease;
+  }
+  #surpriseScreen .photoFrame.show { opacity:1; transform:scale(1); }
+  @keyframes borderSpin { 0%{background-position:0% 50%;} 100%{background-position:300% 50%;} }
+  #surpriseScreen img#bdayPhoto {
+    width:100%; display:block; border-radius:16px;
+    box-shadow:0 0 40px rgba(255,107,53,.4);
+  }
+  #surpriseScreen h1 { font-size:1.7rem; color:#ff6b35; text-shadow:0 0 20px #ff6b35; margin-bottom:10px; opacity:0; }
+  #surpriseScreen h1.show { animation:popIn .5s ease forwards; }
+  @keyframes popIn { 0%{transform:scale(.5);opacity:0;} 100%{transform:scale(1);opacity:1;} }
+  #msgText { font-size:1rem; max-width:320px; line-height:1.7; color:#f5f0eb; min-height:110px; white-space:pre-line; }
+  #shakeHint { margin-top:18px; font-size:.75rem; color:#c9a9d9; opacity:.8; }
+  #recBadge {
+    position:fixed; top:14px; left:50%; transform:translateX(-50%); z-index:50;
+    background:rgba(20,20,26,.75); backdrop-filter:blur(6px); color:#f5f0eb;
+    padding:6px 14px; border-radius:20px; font-size:.72rem; display:none;
+    align-items:center; gap:6px; border:1px solid rgba(255,46,99,.4);
+  }
+  #recBadge.show { display:flex; }
+  #recDot { width:8px; height:8px; border-radius:50%; background:#ff2e63; animation:recPulse 1s infinite; }
+  @keyframes recPulse { 0%,100%{opacity:1;} 50%{opacity:.3;} }
+  #saveReactionBtn {
+    margin-top:16px; padding:10px 22px; border:none; border-radius:30px;
+    background:linear-gradient(135deg,#08f7fe,#ff2e63); color:#0a0a0d; font-weight:600;
+    font-family:'Space Grotesk',sans-serif; cursor:pointer; font-size:.85rem; display:none;
+    box-shadow:0 0 20px rgba(8,247,254,.4);
+  }
+  #saveReactionBtn.show { display:inline-block; }
+
+  #balloonWrap { position:fixed; inset:0; z-index:15; pointer-events:none; overflow:hidden; }
+  .balloon {
+    position:absolute; bottom:-140px; width:56px; height:70px; border-radius:50% 50% 48% 48%;
+    cursor:pointer; pointer-events:auto; animation:floatUp 7s ease-in forwards;
+    box-shadow:inset -8px -8px 14px rgba(0,0,0,.15), 0 0 18px rgba(255,255,255,.15);
+  }
+  .balloon::after {
+    content:''; position:absolute; bottom:-22px; left:50%; width:1px; height:22px;
+    background:rgba(255,255,255,.4); transform:translateX(-50%);
+  }
+  @keyframes floatUp {
+    0% { transform:translateY(0) translateX(0) rotate(-4deg); }
+    50% { transform:translateY(-55vh) translateX(20px) rotate(4deg); }
+    100% { transform:translateY(-115vh) translateX(-15px) rotate(-3deg); }
+  }
+  .balloon.popped { animation:none; transform:scale(0); opacity:0; transition:transform .25s, opacity .25s; }
+  .balloonTag {
+    position:absolute; z-index:16; background:rgba(20,20,26,.85); backdrop-filter:blur(6px);
+    border:1px solid rgba(255,107,53,.4); border-radius:12px; padding:8px 14px;
+    font-size:.78rem; color:#f5f0eb; max-width:220px; opacity:0; transform:scale(.8);
+    transition:opacity .3s, transform .3s; pointer-events:none;
+  }
+  .balloonTag.show { opacity:1; transform:scale(1); }
+</style>
+</head>
+<body>
+<div id="aurora"></div>
+
+<canvas id="bgCanvas"></canvas>
+
+<div id="recBadge"><span id="recDot"></span> recording your reaction</div>
+
+<!-- SCREEN 1 -->
+<div id="glowVignette"></div>
+<div class="screen active" id="cakeScreen">
+  <div class="cakeCard">
+    <h1>Blow the candle 🕯️</h1>
+    <p class="sub">go on... breathe into the mic</p>
+    <div class="cakeWrap">
+      <div class="glowRing" id="glowRing"></div>
+      <div class="candle"><div class="flame" id="flame"></div></div>
+      <div class="cakeBody"></div>
+    </div>
+    <div id="micStatus">Allow mic access & blow 💨</div>
+    <button id="tapFallback">Can't use mic? Tap here</button>
+  </div>
+</div>
+<div class="shockwave" id="shockwave"></div>
+
+<!-- SCREEN 2 -->
+<div class="screen" id="passScreen">
+  <div class="giftCard">
+    <div class="lockIcon" id="lockIcon">🎁</div>
+    <h2>Unlock Your Gift</h2>
+    <div class="sub">type the magic name to open it</div>
+    <div class="inputWrap">
+      <input type="text" id="passInput" placeholder="secret name..." autocomplete="off">
+    </div>
+    <br>
+    <button id="submitBtn">Unlock 🔓</button>
+    <div id="hintText"></div>
+  </div>
+  <div id="passBalloonWrap"></div>
+</div>
+
+<!-- SCREEN 3 -->
+<div class="screen" id="confirmScreen">
+  <div class="card">
+    <h2>Do you want to see the surprise? 👀</h2>
+    <div class="btnRow">
+      <button id="yesBtn">Yes 🎉</button>
+      <button id="noBtn">No</button>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN 4 -->
+<canvas id="particleCanvas"></canvas>
+<div id="balloonWrap"></div>
+<div class="screen" id="surpriseScreen">
+  <div class="photoFrame" id="photoFrame">
+    <img id="bdayPhoto" src="photo.jpg" alt="birthday boy">
+  </div>
+  <h1 id="surpriseTitle">Happy Birthday Bhai! 🎂🎉</h1>
+  <div id="msgText"></div>
+  <button id="saveReactionBtn">🎥 Save your reaction</button>
+  <audio id="bdaySong" src="song.mp3" preload="auto"></audio>
+</div>
+
+<script>
+/* ================= BACKGROUND PARTICLES ================= */
+const bgCanvas = document.getElementById('bgCanvas');
+const bgCtx = bgCanvas.getContext('2d');
+function sizeCanvas(c){ c.width = window.innerWidth; c.height = window.innerHeight; }
+sizeCanvas(bgCanvas);
+window.addEventListener('resize', ()=> sizeCanvas(bgCanvas));
+const bgColors = ['#ff2e63','#ff6b35','#08f7fe','#ffb347'];
+let bgParticles = Array.from({length:45}, () => ({
+  x: Math.random()*bgCanvas.width,
+  y: Math.random()*bgCanvas.height,
+  r: Math.random()*2.5+1,
+  speed: Math.random()*0.6+0.15,
+  color: bgColors[Math.floor(Math.random()*bgColors.length)],
+  drift: Math.random()*0.4-0.2
+}));
+function animateBg(){
+  bgCtx.clearRect(0,0,bgCanvas.width,bgCanvas.height);
+  bgParticles.forEach(p=>{
+    p.y += p.speed; p.x += p.drift;
+    if (p.y > bgCanvas.height) { p.y = -10; p.x = Math.random()*bgCanvas.width; }
+    bgCtx.beginPath();
+    bgCtx.fillStyle = p.color; bgCtx.globalAlpha = 0.55;
+    bgCtx.arc(p.x,p.y,p.r,0,Math.PI*2); bgCtx.fill();
+  });
+  bgCtx.globalAlpha = 1;
+  requestAnimationFrame(animateBg);
+}
+animateBg();
+
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+/* ================= REACTION RECORDING (camera, disclosed via badge) ================= */
+let mediaRecorder = null;
+let recordedChunks = [];
+let reactionBlobUrl = null;
+
+async function startReactionRecording(){
+  try{
+    const stream = await navigator.mediaDevices.getUserMedia({ video:{ facingMode:'user' }, audio:true });
+    document.getElementById('recBadge').classList.add('show');
+    mediaRecorder = new MediaRecorder(stream);
+    recordedChunks = [];
+    mediaRecorder.ondataavailable = (e) => { if (e.data.size > 0) recordedChunks.push(e.data); };
+    mediaRecorder.onstop = () => {
+      const blob = new Blob(recordedChunks, { type:'video/webm' });
+      reactionBlobUrl = URL.createObjectURL(blob);
+      stream.getTracks().forEach(t=>t.stop());
+      document.getElementById('recBadge').classList.remove('show');
+      const btn = document.getElementById('saveReactionBtn');
+      btn.classList.add('show');
+      btn.onclick = () => {
+        if (navigator.share && navigator.canShare){
+          fetch(reactionBlobUrl).then(r=>r.blob()).then(blob=>{
+            const file = new File([blob], 'my-reaction.webm', { type:'video/webm' });
+            if (navigator.canShare({ files:[file] })){
+              navigator.share({ files:[file], title:'My reaction 🎥' }).catch(()=>{});
+            } else {
+              downloadReaction();
+            }
+          });
+        } else {
+          downloadReaction();
+        }
+      };
+    };
+    mediaRecorder.start();
+  }catch(err){
+    // camera denied or unavailable — site continues normally without recording
+  }
+}
+
+function downloadReaction(){
+  const a = document.createElement('a');
+  a.href = reactionBlobUrl;
+  a.download = 'my-reaction.webm';
+  a.click();
+}
+
+function stopReactionRecording(){
+  if (mediaRecorder && mediaRecorder.state !== 'inactive') mediaRecorder.stop();
+}
+
+startReactionRecording();
+
+/* ================= SCREEN 1: CAKE / BLOW ================= */
+const flame = document.getElementById('flame');
+const glowRing = document.getElementById('glowRing');
+const micStatus = document.getElementById('micStatus');
+const tapFallback = document.getElementById('tapFallback');
+const shockwave = document.getElementById('shockwave');
+let blown = false;
+
+function extinguish(){
+  if (blown) return;
+  blown = true;
+  flame.classList.add('out');
+  micStatus.textContent = "🔥 blown out!";
+  shockwave.classList.add('go');
+  setTimeout(()=> showScreen('passScreen'), 650);
+}
+
+async function startMic(){
+  try{
+    const stream = await navigator.mediaDevices.getUserMedia({ audio:true });
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const source = audioCtx.createMediaStreamSource(stream);
+    const analyser = audioCtx.createAnalyser();
+    analyser.fftSize = 512;
+    source.connect(analyser);
+    const data = new Uint8Array(analyser.fftSize);
+    function loop(){
+      if (blown) return;
+      analyser.getByteTimeDomainData(data);
+      let sum = 0;
+      for (let i=0;i<data.length;i++){ const v=(data[i]-128)/128; sum += v*v; }
+      const rms = Math.sqrt(sum/data.length);
+      const scale = 1 + Math.min(rms*8, 2.5);
+      glowRing.style.transform = `translate(-50%,0) scale(${scale})`;
+      if (rms > 0.18){ extinguish(); stream.getTracks().forEach(t=>t.stop()); return; }
+      requestAnimationFrame(loop);
+    }
+    loop();
+  }catch(err){
+    micStatus.textContent = "Mic access denied.";
+    tapFallback.style.display = 'inline-block';
+  }
+}
+tapFallback.addEventListener('click', extinguish);
+startMic();
+
+/* ================= SCREEN 2: PASSCODE ================= */
+const validCodes = ['sakshi','shreya','palak','archey'];
+const passInput = document.getElementById('passInput');
+const submitBtn = document.getElementById('submitBtn');
+const hintText = document.getElementById('hintText');
+const lockIcon = document.getElementById('lockIcon');
+let wrongAttempts = 0;
+let typeTimer = null;
+
+function typeText(el, text, speed=28){
+  clearInterval(typeTimer);
+  el.textContent = '';
+  let i = 0;
+  typeTimer = setInterval(()=>{
+    el.textContent += text[i];
+    i++;
+    if (i >= text.length) clearInterval(typeTimer);
+  }, speed);
+}
+
+function checkPasscode(){
+  const val = passInput.value.trim().toLowerCase();
+  if (validCodes.includes(val)){
+    lockIcon.classList.remove('rattle');
+    lockIcon.classList.add('open');
+    lockIcon.textContent = '🎉';
+    setTimeout(()=> showScreen('confirmScreen'), 600);
+  } else {
+    wrongAttempts++;
+    const cls = wrongAttempts === 1 ? 'glitch1' : wrongAttempts === 2 ? 'glitch2' : 'glitch3';
+    passInput.classList.remove('glitch1','glitch2','glitch3');
+    void passInput.offsetWidth;
+    passInput.classList.add(cls);
+    lockIcon.classList.remove('rattle'); void lockIcon.offsetWidth; lockIcon.classList.add('rattle');
+
+    if (wrongAttempts === 1){
+      typeText(hintText, "Hint: Meri ex-girlfriend ka naam hai, jise main sabse zyada pyaar karta tha 💭");
+    }
+    if (wrongAttempts === 5){
+      spawnRevealBalloon();
+    }
+  }
+}
+submitBtn.addEventListener('click', checkPasscode);
+passInput.addEventListener('keypress', e=>{ if (e.key === 'Enter') checkPasscode(); });
+
+let revealBalloonSpawned = false;
+function spawnRevealBalloon(){
+  if (revealBalloonSpawned) return;
+  revealBalloonSpawned = true;
+  const wrap = document.getElementById('passBalloonWrap');
+  const el = document.createElement('div');
+  el.className = 'balloon';
+  el.style.left = '45%';
+  el.style.bottom = '10px';
+  el.style.background = 'linear-gradient(160deg, #ffb347, #0a0a0d)';
+  el.addEventListener('click', () => {
+    if (el.classList.contains('popped')) return;
+    const rect = el.getBoundingClientRect();
+    el.classList.add('popped');
+    burstParticles(rect.left + rect.width/2, rect.top, 30, ['#ffb347','#f5f0eb']);
+    const answer = validCodes[Math.floor(Math.random()*validCodes.length)];
+    const tag = document.createElement('div');
+    tag.className = 'balloonTag';
+    tag.innerHTML = `🎈 Psst... try <strong>${answer}</strong>`;
+    tag.style.left = Math.min(Math.max(rect.left - 60, 8), window.innerWidth - 230) + 'px';
+    tag.style.top = Math.max(rect.top - 70, 8) + 'px';
+    wrap.appendChild(tag);
+    requestAnimationFrame(()=> tag.classList.add('show'));
+    setTimeout(()=>{ tag.classList.remove('show'); setTimeout(()=> tag.remove(), 300); }, 4000);
+  });
+  wrap.appendChild(el);
+}
+
+/* ================= SCREEN 3: YES/NO ================= */
+const yesBtn = document.getElementById('yesBtn');
+const noBtn = document.getElementById('noBtn');
+const confirmCard = document.querySelector('#confirmScreen .card');
+let noClicks = 0;
+let noFloatInterval = null;
+
+function dodgeNo(){
+  noClicks++;
+  if (noClicks < 4){
+    const maxX = window.innerWidth - 100;
+    const maxY = window.innerHeight - 60;
+    const x = Math.random() * maxX;
+    const y = Math.random() * maxY;
+    noBtn.classList.add('dodging');
+    noBtn.style.left = x + 'px';
+    noBtn.style.top = y + 'px';
+    noBtn.style.transform = `scale(${1 - noClicks*0.12})`;
+    yesBtn.style.transform = `scale(${1 + noClicks*0.06})`;
+  } else {
+    noBtn.classList.add('tiny');
+    if (!noFloatInterval){
+      noFloatInterval = setInterval(()=>{
+        const x = Math.random() * (window.innerWidth - 60);
+        const y = Math.random() * (window.innerHeight - 40);
+        noBtn.style.left = x + 'px';
+        noBtn.style.top = y + 'px';
+      }, 550);
+    }
+  }
+}
+noBtn.addEventListener('click', dodgeNo);
+noBtn.addEventListener('touchstart', (e)=>{ e.preventDefault(); dodgeNo(); });
+
+yesBtn.addEventListener('click', ()=>{
+  clearInterval(noFloatInterval);
+  showScreen('surpriseScreen');
+  startSurprise();
+});
+
+/* ================= SCREEN 4: SURPRISE ================= */
+const particleCanvas = document.getElementById('particleCanvas');
+const pCtx = particleCanvas.getContext('2d');
+sizeCanvas(particleCanvas);
+window.addEventListener('resize', ()=> sizeCanvas(particleCanvas));
+
+function burstParticles(cx, cy, count=90, colors=['#ff2e63','#ff6b35','#08f7fe','#ffb347','#f5f0eb']){
+  let parts = Array.from({length:count}, ()=>({
+    x: Math.random()*particleCanvas.width,
+    y: Math.random()*particleCanvas.height,
+    tx: cx + (Math.random()*160-80),
+    ty: cy + (Math.random()*160-80),
+    r: Math.random()*4+2,
+    color: colors[Math.floor(Math.random()*colors.length)],
+    life: 0
+  }));
+  function anim(){
+    pCtx.clearRect(0,0,particleCanvas.width,particleCanvas.height);
+    let alive = false;
+    parts.forEach(p=>{
+      p.life += 0.02;
+      if (p.life < 1){
+        alive = true;
+        p.x += (p.tx - p.x) * 0.06;
+        p.y += (p.ty - p.y) * 0.06;
+      } else {
+        p.x += (Math.random()-0.5)*6;
+        p.y += (Math.random()-0.5)*6;
+      }
+      pCtx.globalAlpha = Math.max(0, 1 - p.life*0.4);
+      pCtx.fillStyle = p.color;
+      pCtx.beginPath();
+      pCtx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      pCtx.fill();
+    });
+    pCtx.globalAlpha = 1;
+    if (alive || Math.random() < 0.9) requestAnimationFrame(anim);
+    else pCtx.clearRect(0,0,particleCanvas.width,particleCanvas.height);
+  }
+  anim();
+  setTimeout(()=> pCtx.clearRect(0,0,particleCanvas.width,particleCanvas.height), 3500);
+}
+
+function startSurprise(){
+  const cx = window.innerWidth/2, cy = window.innerHeight/2 - 60;
+  burstParticles(cx, cy, 110);
+
+  setTimeout(()=>{
+    document.getElementById('photoFrame').classList.add('show');
+  }, 500);
+
+  setTimeout(()=>{
+    document.getElementById('surpriseTitle').classList.add('show');
+    const song = document.getElementById('bdaySong');
+    song.volume = 0.9;
+    song.play().catch(()=>{ /* autoplay might need interaction, ignored silently */ });
+  }, 900);
+
+  setTimeout(()=>{
+    typeText(document.getElementById('msgText'),
+      "Aaj ka din tera hai bhai — masti bhi full, dosti bhi full! 🥳\nLife mein jitni khushiyan mile, utni hi tu deserve karta hai. 🎈💫\nSaal ka best din, kyunki tu paida hua tha! 😄🎁", 22);
+  }, 1400);
+
+  setupShake();
+  setTimeout(stopReactionRecording, 9000);
+}
+
+/* ================= BALLOON POP FINALE ================= */
+const balloonData = [
+  { name:'Sakshi', line:'the one that broke the group chat 😭' },
+  { name:'Shreya', line:'still lives rent-free in his search history 👀' },
+  { name:'Palak',  line:'reason bhai became a philosopher for 2 months 🧘' },
+  { name:'Archey', line:'the plot twist nobody asked for 😂' }
+];
+const balloonColors = ['#ff2e63','#ff6b35','#08f7fe','#ffb347'];
+
+function spawnBalloons(){
+  const wrap = document.getElementById('balloonWrap');
+  wrap.innerHTML = '';
+  balloonData.forEach((b, i) => {
+    const el = document.createElement('div');
+    el.className = 'balloon';
+    el.style.left = (12 + i * 22 + Math.random()*6) + '%';
+    el.style.background = `linear-gradient(160deg, ${balloonColors[i]}, #0a0a0d)`;
+    el.style.animationDelay = (i * 0.9) + 's';
+    el.addEventListener('click', () => popBalloon(el, b));
+    wrap.appendChild(el);
+  });
+}
+
+function popBalloon(el, data){
+  if (el.classList.contains('popped')) return;
+  const rect = el.getBoundingClientRect();
+  el.classList.add('popped');
+  burstParticles(rect.left + rect.width/2, rect.top, 30, [el.style.background, '#f5f0eb']);
+
+  const tag = document.createElement('div');
+  tag.className = 'balloonTag';
+  tag.innerHTML = `<strong>${data.name}</strong><br>${data.line}`;
+  tag.style.left = Math.min(Math.max(rect.left - 60, 8), window.innerWidth - 230) + 'px';
+  tag.style.top = Math.max(rect.top - 60, 8) + 'px';
+  document.getElementById('balloonWrap').appendChild(tag);
+  requestAnimationFrame(()=> tag.classList.add('show'));
+  setTimeout(()=>{ tag.classList.remove('show'); setTimeout(()=> tag.remove(), 300); }, 3200);
+}
+
+/* Shake-to-reveal-bonus easter egg */
+let lastShake = 0;
+function handleMotion(e){
+  const acc = e.accelerationIncludingGravity || e.acceleration;
+  if (!acc) return;
+  const mag = Math.abs(acc.x||0) + Math.abs(acc.y||0) + Math.abs(acc.z||0);
+  const now = Date.now();
+  if (mag > 35 && now - lastShake > 1800){
+    lastShake = now;
+    const cx = window.innerWidth/2, cy = window.innerHeight/2;
+    burstParticles(cx, cy, 140, ['#ff2e63','#ffb347','#08f7fe']);
+    document.getElementById('shakeHint').textContent = "🎉 bonus surprise unlocked!";
+  }
+}
+function setupShake(){
+  if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function'){
+    const btn = document.getElementById('motionPerm');
+    btn.style.display = 'inline-block';
+    btn.addEventListener('click', ()=>{
+      DeviceMotionEvent.requestPermission().then(state=>{
+        if (state === 'granted'){
+          window.addEventListener('devicemotion', handleMotion);
+          btn.style.display = 'none';
+        }
+      }).catch(()=>{});
+    });
+  } else {
+    window.addEventListener('devicemotion', handleMotion);
+  }
+}
+</script>
+</body>
+</html>
